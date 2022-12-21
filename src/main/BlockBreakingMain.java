@@ -17,13 +17,16 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
     LinkedList<GameObject> objects = new LinkedList<>();
     int stickWidth = 150;
     int stickHeight = 40;
-    int ballRadius = 5;
+    float ballRadius = 5;
     int stage;
     Point windowSize = new Point(800, 772);
+    static Stick stick;
 
     public BlockBreakingMain(int stage) {
         this.stage = stage;
         setBackground(black);
+
+        stick = new Stick(new Point(350, 700), LIGHT_GRAY, stickWidth, stickHeight);
 
         Dimension d = new Dimension(windowSize.x, windowSize.y);
         init(stage, d);
@@ -40,11 +43,13 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
+        stick.draw(g);
+
         // 블록 채우기
         for(GameObject o : objects) {
 
-            if( o instanceof Block) {
-                if(!((Block) o).isBlockBreakCheck()) {
+            if( o instanceof Block block) {
+                if(!block.isBlockBreakCheck()) {
                     blockBreakAllow(g, o);
                 } else {
                     o.draw(g);
@@ -83,7 +88,6 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
         Block boundaryOne = new Block(new Point(0, 0), GRAY, 1.0f, windowSize.y, false);
         Block boundaryTwo = new Block(new Point(0, 0), GRAY, windowSize.x, 1.0f, false);
         Block boundaryThr = new Block(new Point(windowSize.x, 0), GRAY, 1.0f, windowSize.y, false);
-        Stick stick = new Stick(new Point(350, 700), LIGHT_GRAY, stickWidth, stickHeight);
         //Block stick = new Block(new Point(450, 650,), white, stickWidth, stickHeight, false);
 
         //stick.setBlockBreakCheck(true);
@@ -94,8 +98,7 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
         objects.add(boundaryOne);
         objects.add(boundaryTwo);
         objects.add(boundaryThr);
-        objects.add(stick);
-        objects.add(new Ball(new Point(450, 650), white, ballRadius));
+        objects.add(new Ball(new Point(300, 500), white, ballRadius));
         objects.addAll(Arrays.asList(blocks));
     }
 
@@ -110,25 +113,16 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
     @Override
     public void keyPressed(KeyEvent e) {
 
-        ListIterator<GameObject> it = objects.listIterator();
-        GameObject stick = getGameObject(it);
-        Point p = stick.getP();
-
         if(e.getKeyCode() == KeyEvent.VK_LEFT) {
-
-            p.x -= 40;
-            p.y = 700;
-            stick.setP(p);
-
-            if(p.x < 0) p.x = 0;
+            stick.p.x -= 40;
+            stick.p.y = 700;
+            stick.setP(stick.getP());
 
         } else if(e.getKeyCode() == KeyEvent.VK_RIGHT) {
+            stick.p.x += 40;
+            stick.p.y = 700;
+            stick.setP(stick.getP());
 
-            p.x += 40;
-            p.y = 700;
-            stick.setP(p);
-
-            if(p.x + stickWidth > 800) p.x = 800 - stickWidth;
         }
         repaint();
     }
@@ -143,6 +137,7 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
                 e.printStackTrace();
             }
 
+            System.out.println(stick.p);
             // ball update
             for(var a : objects) {
                 a.update(0.016f);
@@ -153,24 +148,15 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
                 if(!(a instanceof Ball)) continue;
 
                 for(var b : objects) {
-                    if(!(b instanceof Block)) continue;
+                    if(!(b instanceof Block block)) continue;
 
-                    for(var c : objects) {
-                        if(!(c instanceof Stick stick)) continue;
+                    Ball ball = (Ball) a;
 
-                        Ball ball = (Ball) a;
-                        Block block = (Block) b;
-
-                        if (ball.isCollide(block)) {
-                            ball.collision(block);
-                        }
-
-                        if (ball.isCollide(stick)) {
-                            ball.collision(stick);
-                        }
-                    }
+                    if (ball.isCollide(block)) ball.collision(block);
+                    if (ball.isCollide(stick)) ball.collision(stick);
                 }
             }
+
             repaint();
         }
     }

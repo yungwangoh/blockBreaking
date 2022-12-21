@@ -5,7 +5,7 @@ import java.awt.*;
 public class Ball extends GameObject{
 
     private float r;
-    private final float speed = 180.0f;
+    private final static float SPEED = 180.0f;
     private float vx, vy;
     private float preX;
     private float preY;
@@ -17,8 +17,8 @@ public class Ball extends GameObject{
         preX = p.x;
         preY = p.y;
 
-        this.vx = speed;
-        this.vy = speed;
+        this.vx = SPEED;
+        this.vy = SPEED;
     }
 
     @Override
