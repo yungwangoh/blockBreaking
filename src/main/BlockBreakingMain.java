@@ -16,7 +16,7 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
 
     LinkedList<GameObject> objects = new LinkedList<>();
     int stickWidth = 150;
-    int stickHeight = 10;
+    int stickHeight = 40;
     int ballRadius = 5;
     int stage;
     Point windowSize = new Point(800, 772);
@@ -83,7 +83,10 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
         Block boundaryOne = new Block(new Point(0, 0), GRAY, 1.0f, windowSize.y, false);
         Block boundaryTwo = new Block(new Point(0, 0), GRAY, windowSize.x, 1.0f, false);
         Block boundaryThr = new Block(new Point(windowSize.x, 0), GRAY, 1.0f, windowSize.y, false);
+        Stick stick = new Stick(new Point(350, 700), LIGHT_GRAY, stickWidth, stickHeight);
+        //Block stick = new Block(new Point(450, 650,), white, stickWidth, stickHeight, false);
 
+        //stick.setBlockBreakCheck(true);
         boundaryOne.setBlockBreakCheck(true);
         boundaryTwo.setBlockBreakCheck(true);
         boundaryThr.setBlockBreakCheck(true);
@@ -91,7 +94,7 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
         objects.add(boundaryOne);
         objects.add(boundaryTwo);
         objects.add(boundaryThr);
-        objects.add(new Stick(new Point(350, 700), LIGHT_GRAY, stickWidth, stickHeight));
+        objects.add(stick);
         objects.add(new Ball(new Point(450, 650), white, ballRadius));
         objects.addAll(Arrays.asList(blocks));
     }
@@ -106,20 +109,26 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
 
     @Override
     public void keyPressed(KeyEvent e) {
+
         ListIterator<GameObject> it = objects.listIterator();
-        GameObject g = getGameObject(it);
+        GameObject stick = getGameObject(it);
+        Point p = stick.getP();
 
         if(e.getKeyCode() == KeyEvent.VK_LEFT) {
 
-            g.p.x -= 50;
-            g.p.y = 700;
-            g.setP(g.p);
+            p.x -= 40;
+            p.y = 700;
+            stick.setP(p);
+
+            if(p.x < 0) p.x = 0;
 
         } else if(e.getKeyCode() == KeyEvent.VK_RIGHT) {
 
-            g.p.x += 50;
-            g.p.y = 700;
-            g.setP(g.p);
+            p.x += 40;
+            p.y = 700;
+            stick.setP(p);
+
+            if(p.x + stickWidth > 800) p.x = 800 - stickWidth;
         }
         repaint();
     }
@@ -127,6 +136,7 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
     @Override
     public void run() {
         while (true) {
+
             try {
                 Thread.sleep(16);
             } catch (InterruptedException e) {
@@ -151,10 +161,11 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
                         Ball ball = (Ball) a;
                         Block block = (Block) b;
 
-                        if(ball.isCollide(block)) {
+                        if (ball.isCollide(block)) {
                             ball.collision(block);
                         }
-                        if(ball.isCollide(stick)) {
+
+                        if (ball.isCollide(stick)) {
                             ball.collision(stick);
                         }
                     }
@@ -189,8 +200,8 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
         while(it.hasNext()) {
             GameObject next = it.next();
 
-            if(next instanceof Stick) {
-                g = next;
+            if(next instanceof Stick stick) {
+                g = stick;
             }
         }
         return g;

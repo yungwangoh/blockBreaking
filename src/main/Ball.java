@@ -5,7 +5,7 @@ import java.awt.*;
 public class Ball extends GameObject{
 
     private float r;
-    private float speed = 130.0f;
+    private final float speed = 180.0f;
     private float vx, vy;
     private float preX;
     private float preY;
@@ -75,19 +75,19 @@ public class Ball extends GameObject{
     }
 
     private void objectCollision(Stick stick) {
-        if(preX < stick.p.x - r) {
+        if(preX < (stick.p.x - r)) {
             p.x = (int) (stick.p.x - r);
             vx = -vx;
         }
-        if(preX > stick.p.x + stick.getWidth() + r) {
+        if(preX > (stick.p.x + stick.getWidth() + r)) {
             p.x = (int) (stick.p.x + stick.getWidth() + r);
             vx = -vx;
         }
-        if(preY < stick.p.y - r) {
+        if(preY < (stick.p.y - r)) {
             p.y = (int) (stick.p.y - r);
             vy = -vy;
         }
-        if(preY > stick.p.y + stick.getHeight() + r) {
+        if(preY > (stick.p.y + stick.getHeight() + r)) {
             p.y = (int) (stick.p.y + stick.getHeight() + r);
             vy = -vy;
         }
@@ -110,5 +110,21 @@ public class Ball extends GameObject{
             p.y = (int) (block.p.y + block.getHeight() + r);
             vy = -vy;
         }
+    }
+
+    public float getPreX() {
+        return preX;
+    }
+
+    public void setPreX(float preX) {
+        this.preX = preX;
+    }
+
+    public float getPreY() {
+        return preY;
+    }
+
+    public void setPreY(float preY) {
+        this.preY = preY;
     }
 }

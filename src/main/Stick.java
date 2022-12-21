@@ -25,7 +25,9 @@ public class Stick extends GameObject{
     }
 
     @Override
-    void update(float dt) {}
+    void update(float dt) {
+
+    }
 
     public float getWidth() {
         return width;
