@@ -1,5 +1,7 @@
 package front;
 
+import main.BlockBreakMainView;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -9,7 +11,7 @@ import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-public class BlockBreakingFrontView extends JPanel implements KeyListener {
+public class BlockBreakingFrontView extends JPanel implements KeyListener, Runnable {
 
     private BufferedImage image;
     private boolean gameStart = false;
@@ -49,13 +51,19 @@ public class BlockBreakingFrontView extends JPanel implements KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         if(e.getKeyCode() == KeyEvent.VK_SPACE) {
-            gameStart = true;
+            new BlockBreakMainView();
+            setVisible(false);
         }
         repaint();
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
+
+    }
+
+    @Override
+    public void run() {
 
     }
 

@@ -56,14 +56,6 @@ public class Ball extends GameObject{
         return false;
     }
 
-    public float getR() {
-        return r;
-    }
-
-    public void setR(float r) {
-        this.r = r;
-    }
-
     private boolean collideCondition(Block block) {
         return p.x > (block.p.x - r) && p.x < (block.p.x + block.getWidth() + r) &&
                 p.y > (block.p.y - r) && p.y < (block.p.y + block.getHeight() + r);
@@ -79,16 +71,16 @@ public class Ball extends GameObject{
             p.x = (int) (stick.p.x - r);
             vx = -vx;
         }
-        if(preX > (stick.p.x + stick.getWidth() + r)) {
+        else if(preX > (stick.p.x + stick.getWidth() + r)) {
             p.x = (int) (stick.p.x + stick.getWidth() + r);
             vx = -vx;
         }
-        if(preY < (stick.p.y - r)) {
+        else if(preY < (stick.p.y - r)) {
             p.y = (int) (stick.p.y - r);
             vy = -vy;
         }
-        if(preY > (stick.p.y + stick.getHeight() + r)) {
-            p.y = (int) (stick.p.y + stick.getHeight() + r);
+        else if(preY > (stick.p.y - stick.getHeight())) {
+            p.y = (int) (stick.p.y - stick.getHeight());
             vy = -vy;
         }
     }
@@ -98,33 +90,17 @@ public class Ball extends GameObject{
             p.x = (int) (block.p.x - r);
             vx = -vx;
         }
-        if(preX > block.p.x + block.getWidth() + r) {
+        else if(preX > block.p.x + block.getWidth() + r) {
             p.x = (int) (block.p.x + block.getWidth() + r);
             vx = -vx;
         }
-        if(preY < block.p.y - r) {
+        else if(preY < block.p.y - r) {
             p.y = (int) (block.p.y - r);
             vy = -vy;
         }
-        if(preY > block.p.y + block.getHeight() + r) {
+        else if(preY > block.p.y + block.getHeight() + r) {
             p.y = (int) (block.p.y + block.getHeight() + r);
             vy = -vy;
         }
-    }
-
-    public float getPreX() {
-        return preX;
-    }
-
-    public void setPreX(float preX) {
-        this.preX = preX;
-    }
-
-    public float getPreY() {
-        return preY;
-    }
-
-    public void setPreY(float preY) {
-        this.preY = preY;
     }
 }

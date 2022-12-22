@@ -32,8 +32,8 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
         init(stage, d);
 
         addKeyListener(this);
-        requestFocus();
         setFocusable(true);
+        requestFocus();
 
         Thread t = new Thread(this);
         t.start();
@@ -85,9 +85,10 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
         blockColorInit(stage, stageBlockSize, colorCheck);
         blockInit(stageBlockSize, w, h, colorCheck, index, blocks);
 
-        Block boundaryOne = new Block(new Point(0, 0), GRAY, 1.0f, windowSize.y, false);
-        Block boundaryTwo = new Block(new Point(0, 0), GRAY, windowSize.x, 1.0f, false);
-        Block boundaryThr = new Block(new Point(windowSize.x, 0), GRAY, 1.0f, windowSize.y, false);
+        Block boundaryOne = new Block(new Point(0, 0), GRAY, 5.0f, windowSize.y, false);
+        Block boundaryTwo = new Block(new Point(0, 0), GRAY, windowSize.x, 5.0f, false);
+        Block boundaryThr = new Block(new Point(windowSize.x, 0), GRAY, 5.0f, windowSize.y, false);
+        Block block = new Block(new Point(0, windowSize.y), GRAY, windowSize.x, 5.0f, false);
         //Block stick = new Block(new Point(450, 650,), white, stickWidth, stickHeight, false);
 
         //stick.setBlockBreakCheck(true);
@@ -98,6 +99,7 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
         objects.add(boundaryOne);
         objects.add(boundaryTwo);
         objects.add(boundaryThr);
+        objects.add(block);
         objects.add(new Ball(new Point(300, 500), white, ballRadius));
         objects.addAll(Arrays.asList(blocks));
     }
@@ -107,7 +109,7 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
     }
 
     public static void end() {
-        new BlockBreakingEndView();
+
     }
 
     @Override
@@ -130,14 +132,12 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
     @Override
     public void run() {
         while (true) {
-
             try {
                 Thread.sleep(16);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
-            System.out.println(stick.p);
             // ball update
             for(var a : objects) {
                 a.update(0.016f);
@@ -145,16 +145,17 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
 
             // collision
             for(var a : objects) {
-                if(!(a instanceof Ball)) continue;
+                if(!(a instanceof Ball ball)) continue;
 
                 for(var b : objects) {
                     if(!(b instanceof Block block)) continue;
 
-                    Ball ball = (Ball) a;
-
-                    if (ball.isCollide(block)) ball.collision(block);
-                    if (ball.isCollide(stick)) ball.collision(stick);
+                    if (ball.isCollide(block))
+                        ball.collision(block);
                 }
+
+                if (ball.isCollide(stick))
+                    ball.collision(stick);
             }
 
             repaint();
