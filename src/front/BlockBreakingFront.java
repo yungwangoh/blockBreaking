@@ -50,7 +50,7 @@ public class BlockBreakingFront extends JPanel implements KeyListener, Runnable 
     @Override
     public void keyPressed(KeyEvent e) {
         if(e.getKeyCode() == KeyEvent.VK_SPACE) {
-            new BlockBreakMainView();
+            new BlockBreakMainView(1);
             setVisible(false);
         }
         repaint();

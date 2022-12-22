@@ -2,11 +2,12 @@ package main;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ListIterator;
 
 public class Ball extends GameObject{
 
     private float r;
-    private final static float SPEED = 200.0f;
+    private final static float SPEED = 500.0f;
     private float vx, vy;
     private float preX;
     private float preY;

@@ -11,22 +11,34 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
+import static game.StageStep.*;
 import static java.awt.Color.*;
 
 public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
 
-    private static LinkedList<GameObject> objects = new LinkedList<>();
-    private final int stickWidth = 150;
-    private final Point windowSize = new Point(800, 772);
-    private static Stick stick;
-    private float ballRadius = 4.5f;
+    private LinkedList<GameObject> objects;
+    private final int stickWidth;
+    private final Point windowSize;
+    private final Stick stick;
+    private final Ball ball;
+    private boolean end;
     private int stage;
+    private boolean nextStage;
+    private float ballRadius;
+    private static int score = 0;
 
     public BlockBreakingMain(int stage) {
         setBackground(black);
 
+        objects = new LinkedList<>();
+        end = false;
         this.stage = stage;
+        nextStage = false;
+        ballRadius = 8.5f;
         int stickHeight = 40;
+        windowSize = new Point(800, 772);
+        stickWidth = 180;
+        ball = new Ball(new Point(300, 500), white, ballRadius);
 
         stick = new Stick(new Point(350, 700), LIGHT_GRAY, stickWidth, stickHeight);
 
@@ -48,18 +60,19 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
         stick.draw(g);
 
         // 블록 채우기
-        for(GameObject o : objects) {
+        for(int i = 0; i < objects.size(); i++) {
 
-            if( o instanceof Block block) {
+            if(objects.get(i) instanceof Block block) {
                 if(!block.isBlockBreakCheck()) {
-                    blockBreakAllow(g, o);
+                    blockBreakAllow(g, objects.get(i));
                 } else {
-                    o.draw(g);
+                    objects.get(i).draw(g);
                 }
             } else {
-                o.draw(g);
+                objects.get(i).draw(g);
             }
         }
+        repaint();
     }
 
     private void blockBreakAllow(Graphics g, GameObject o) {
@@ -80,7 +93,7 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
         int stageBlockSize = 4 * stage;
         int w = d.width / (stageBlockSize);
         int h = d.height / (stageBlockSize) / 3;
-        int[] colorCheck = new int[stage * 2];
+        int[] colorCheck = new int[stage * stage * 4];
         int index = 0;
         Block[] blocks = new Block[stageBlockSize * stageBlockSize];
 
@@ -98,36 +111,31 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
         objects.add(boundaryOne);
         objects.add(boundaryTwo);
         objects.add(boundaryThr);
-        objects.add(new Ball(new Point(300, 500), white, ballRadius));
+        objects.add(ball);
         objects.addAll(Arrays.asList(blocks));
     }
 
-    public void start() {
-
-    }
-
     public void nextStage(int stage) {
-        new BlockBreakingMain(stage + 1);
-        setVisible(false);
+        new BlockBreakMainView(stage);
+        nextStage = false;
     }
 
     public void end() {
         new BlockBreakEndView();
-        setVisible(false);
+        end = false;
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
-
         if(e.getKeyCode() == KeyEvent.VK_LEFT) {
-            stick.p.x -= 40;
+            stick.p.x -= 50;
             stick.p.y = 700;
             stick.setP(stick.getP());
 
             if(stick.p.x < 0) stick.p.x = 0;
 
         } else if(e.getKeyCode() == KeyEvent.VK_RIGHT) {
-            stick.p.x += 40;
+            stick.p.x += 50;
             stick.p.y = 700;
             stick.setP(stick.getP());
 
@@ -140,18 +148,18 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
     public void run() {
         while (true) {
             try {
-                Thread.sleep(16);
+                Thread.sleep(35);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
             // ball update
-            for(var a : objects) {
+            for (var a : objects) {
                 a.update(0.016f);
             }
 
             // collision
-            for(int i = 0; i < objects.size(); i++) {
+            for (int i = 0; i < objects.size(); i++) {
                 if (!(objects.get(i) instanceof Ball ball)) continue;
 
                 for (int j = 0; j < objects.size(); j++) {
@@ -160,6 +168,11 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
                     if (ball.isCollide(block)) {
                         if (!block.isBlockBreakCheck()) {
                             objects.remove(block);
+                            BlockBreakingMain.score += 100;
+                            if(block.isColorCheck()) {
+                                objects.add(new Ball(new Point((int)( block.getP().x + block.getWidth()),
+                                        block.getP().y), WHITE, ballRadius));
+                            }
                         }
                         ball.collision(block);
                     }
@@ -172,35 +185,52 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
                 }
             }
 
-            if(!endCheck()) {
+            if(!nextStageCheck()) {
+                nextStage = true;
+                break;
+            }
+
+            if (!endCheck(stage)) {
+                end = true;
                 break;
             }
             repaint();
         }
-        new BlockBreakEndView();
+
+        if(nextStage) {
+            nextStage(stage + 1);
+        }
+
+        if(end) {
+            end();
+        }
+        repaint();
     }
 
-    public boolean endCheck() {
+    private boolean nextStageCheck() {
         int blockCheck = 0;
+
+        for(GameObject object : objects) {
+            if(object instanceof Block) {
+                blockCheck++;
+            }
+        }
+        return blockCheck > 3;
+    }
+
+    private boolean endCheck(int stage) {
         int ballCheck = 0;
 
         for (GameObject object : objects) {
             if (object instanceof Ball) {
                 ballCheck++;
             }
-            if(object instanceof Block) {
-                blockCheck++;
-            }
         }
-        if(blockCheck > 3 && ballCheck >= 1) {
-            return true;
-        } else {
-            return false;
-        }
+        return ballCheck >= 1 || stage >= THREE;
     }
 
     private void blockColorInit(int stage, int stageBlockSize, int[] colorCheck) {
-        for(int i = 0; i < stage * 2; i++) {
+        for(int i = 0; i < stage * stage * 4; i++) {
             colorCheck[i] = ((int) (Math.random() * (int) Math.pow(stageBlockSize, 2) - 1) + 1);
         }
     }
@@ -216,19 +246,6 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
         for (int i : colorCheck) {
             blocks[i].setColorCheck(true);
         }
-    }
-
-    private GameObject getGameObject(ListIterator<GameObject> it) {
-        GameObject g = null;
-
-        while(it.hasNext()) {
-            GameObject next = it.next();
-
-            if(next instanceof Stick stick) {
-                g = stick;
-            }
-        }
-        return g;
     }
 
     @Override
