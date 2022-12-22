@@ -1,6 +1,7 @@
 package main;
 
-import end.BlockBreakingEndView;
+import end.BlockBreakEndView;
+import game.StageStep;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,17 +15,18 @@ import static java.awt.Color.*;
 
 public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
 
-    LinkedList<GameObject> objects = new LinkedList<>();
-    int stickWidth = 150;
-    int stickHeight = 40;
-    float ballRadius = 5;
-    int stage;
-    Point windowSize = new Point(800, 772);
-    static Stick stick;
+    private static LinkedList<GameObject> objects = new LinkedList<>();
+    private final int stickWidth = 150;
+    private final Point windowSize = new Point(800, 772);
+    private static Stick stick;
+    private float ballRadius = 4.5f;
+    private int stage;
 
     public BlockBreakingMain(int stage) {
-        this.stage = stage;
         setBackground(black);
+
+        this.stage = stage;
+        int stickHeight = 40;
 
         stick = new Stick(new Point(350, 700), LIGHT_GRAY, stickWidth, stickHeight);
 
@@ -88,10 +90,7 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
         Block boundaryOne = new Block(new Point(0, 0), GRAY, 5.0f, windowSize.y, false);
         Block boundaryTwo = new Block(new Point(0, 0), GRAY, windowSize.x, 5.0f, false);
         Block boundaryThr = new Block(new Point(windowSize.x, 0), GRAY, 5.0f, windowSize.y, false);
-        Block block = new Block(new Point(0, windowSize.y), GRAY, windowSize.x, 5.0f, false);
-        //Block stick = new Block(new Point(450, 650,), white, stickWidth, stickHeight, false);
 
-        //stick.setBlockBreakCheck(true);
         boundaryOne.setBlockBreakCheck(true);
         boundaryTwo.setBlockBreakCheck(true);
         boundaryThr.setBlockBreakCheck(true);
@@ -99,17 +98,22 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
         objects.add(boundaryOne);
         objects.add(boundaryTwo);
         objects.add(boundaryThr);
-        objects.add(block);
         objects.add(new Ball(new Point(300, 500), white, ballRadius));
         objects.addAll(Arrays.asList(blocks));
     }
 
-    public static void start() {
+    public void start() {
 
     }
 
-    public static void end() {
+    public void nextStage(int stage) {
+        new BlockBreakingMain(stage + 1);
+        setVisible(false);
+    }
 
+    public void end() {
+        new BlockBreakEndView();
+        setVisible(false);
     }
 
     @Override
@@ -120,11 +124,14 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
             stick.p.y = 700;
             stick.setP(stick.getP());
 
+            if(stick.p.x < 0) stick.p.x = 0;
+
         } else if(e.getKeyCode() == KeyEvent.VK_RIGHT) {
             stick.p.x += 40;
             stick.p.y = 700;
             stick.setP(stick.getP());
 
+            if(stick.p.x + stickWidth > 800) stick.p.x = 800 - stickWidth;
         }
         repaint();
     }
@@ -144,21 +151,51 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
             }
 
             // collision
-            for(var a : objects) {
-                if(!(a instanceof Ball ball)) continue;
+            for(int i = 0; i < objects.size(); i++) {
+                if (!(objects.get(i) instanceof Ball ball)) continue;
 
-                for(var b : objects) {
-                    if(!(b instanceof Block block)) continue;
+                for (int j = 0; j < objects.size(); j++) {
+                    if (!(objects.get(j) instanceof Block block)) continue;
 
-                    if (ball.isCollide(block))
+                    if (ball.isCollide(block)) {
+                        if (!block.isBlockBreakCheck()) {
+                            objects.remove(block);
+                        }
                         ball.collision(block);
+                    }
                 }
-
                 if (ball.isCollide(stick))
                     ball.collision(stick);
+
+                if (ball.ballRemove(this)) {
+                    objects.remove(ball);
+                }
             }
 
+            if(!endCheck()) {
+                break;
+            }
             repaint();
+        }
+        new BlockBreakEndView();
+    }
+
+    public boolean endCheck() {
+        int blockCheck = 0;
+        int ballCheck = 0;
+
+        for (GameObject object : objects) {
+            if (object instanceof Ball) {
+                ballCheck++;
+            }
+            if(object instanceof Block) {
+                blockCheck++;
+            }
+        }
+        if(blockCheck > 3 && ballCheck >= 1) {
+            return true;
+        } else {
+            return false;
         }
     }
 

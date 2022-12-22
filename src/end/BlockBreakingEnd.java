@@ -1,6 +1,7 @@
-package front;
+package end;
 
-import main.BlockBreakMainView;
+import front.BlockBreakFrontView;
+import front.CustomLabel;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -11,12 +12,11 @@ import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-public class BlockBreakingFrontView extends JPanel implements KeyListener, Runnable {
+public class BlockBreakingEnd extends JPanel implements KeyListener {
 
     private BufferedImage image;
-    private boolean gameStart = false;
 
-    public BlockBreakingFrontView() {
+    public BlockBreakingEnd() {
         try {
             image = ImageIO.read(new FileInputStream("image/space.jpeg"));
 
@@ -24,13 +24,13 @@ public class BlockBreakingFrontView extends JPanel implements KeyListener, Runna
             e.printStackTrace();
         }
 
-        JLabel jLabelTitle = new CustomLabel("Block Breaking!!!", Color.RED, Font.ROMAN_BASELINE, 80);
-        JLabel jLabelBottom =  new CustomLabel("Press Space Bar!!", Color.BLUE, Font.BOLD, 25);
+        JLabel label = new CustomLabel("The End", Color.RED, Font.BOLD, 80);
+        JLabel score = new CustomLabel("Score : " + "80", Color.WHITE, Font.BOLD, 80);
 
         setLayout(new GridLayout(2, 1));
 
-        add(jLabelTitle);
-        add(jLabelBottom);
+        add(label);
+        add(score);
 
         addKeyListener(this);
         requestFocus();
@@ -40,7 +40,8 @@ public class BlockBreakingFrontView extends JPanel implements KeyListener, Runna
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.drawImage(image, 0,0, this);
+
+        g.drawImage(image, 0, 0, this);
     }
 
     @Override
@@ -51,27 +52,13 @@ public class BlockBreakingFrontView extends JPanel implements KeyListener, Runna
     @Override
     public void keyPressed(KeyEvent e) {
         if(e.getKeyCode() == KeyEvent.VK_SPACE) {
-            new BlockBreakMainView();
+            new BlockBreakFrontView();
             setVisible(false);
         }
-        repaint();
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
 
-    }
-
-    @Override
-    public void run() {
-
-    }
-
-    public boolean isGameStart() {
-        return gameStart;
-    }
-
-    public void setGameStart(boolean gameStart) {
-        this.gameStart = gameStart;
     }
 }

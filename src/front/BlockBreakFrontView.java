@@ -9,7 +9,7 @@ public class BlockBreakFrontView extends JFrame {
         setTitle("Block Breaking!!!");
         setSize(800, 800);
 
-        add(new BlockBreakingFrontView());
+        add(new BlockBreakingFront());
         setVisible(true);
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);

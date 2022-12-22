@@ -3,8 +3,7 @@ package main;
 import javax.swing.*;
 import java.awt.*;
 
-import static game.StageStep.ONE;
-import static game.StageStep.TWO;
+import static game.StageStep.*;
 
 public class BlockBreakMainView extends JFrame {
 
@@ -12,7 +11,8 @@ public class BlockBreakMainView extends JFrame {
         setTitle("Block Breaking!!!");
         setSize(800, 800);
 
-        add(new BlockBreakingMain(ONE));
+        BlockBreakingMain stageOne = new BlockBreakingMain(ONE);
+        add(stageOne);
 
         setVisible(true);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
