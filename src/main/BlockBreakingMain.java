@@ -8,7 +8,6 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -29,15 +28,15 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
     private float ballRadius;
     private Clip clip;
     public static int score = 0;
-    private InputStream f1, f2;
+    private URL f1, f2;
 
     public BlockBreakingMain(int stage) {
         setBackground(black);
 
         /*f1 = new File("audio/ballCollision.wav");
         f2 = new File("audio/stickCollision.wav");*/
-        f1 = this.getClass().getResourceAsStream("../audio/ballCollision.wav");
-        f2 = this.getClass().getResourceAsStream("../audio/stickCollision.wav");
+        f1 = this.getClass().getResource("audio/ballCollision.wav");
+        f2 = this.getClass().getResource("audio/stickCollision.wav");
 
         objects = new LinkedList<>();
         end = false;
@@ -62,14 +61,14 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
         t.start();
     }
 
-    private void ballCollisionSound(InputStream f1) {
+    private void ballCollisionSound(URL f1) {
         soundControl(f1);
     }
-    private void stickCollisionSound(InputStream f2) {
+    private void stickCollisionSound(URL f2) {
         soundControl(f2);
     }
 
-    private void soundControl(InputStream f) {
+    private void soundControl(URL f) {
         try {
             AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(f);
 
@@ -283,7 +282,7 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
     private void collisionBallInc(Block block) {
         if(block.isColorCheck()) {
             objects.add(new Ball(new Point((int)( block.getP().x + block.getWidth()) / 2,
-                    (int) (block.getP().y + block.getHeight())), WHITE, ballRadius));
+                    (int) (block.getP().y + block.getHeight()) / 2), WHITE, ballRadius));
         }
     }
 

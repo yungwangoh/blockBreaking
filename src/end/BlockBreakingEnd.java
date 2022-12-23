@@ -11,10 +11,8 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 
 public class BlockBreakingEnd extends JPanel implements KeyListener {
 
@@ -23,7 +21,7 @@ public class BlockBreakingEnd extends JPanel implements KeyListener {
 
     public BlockBreakingEnd() {
         try {
-            InputStream inputStream = this.getClass().getResourceAsStream("../image/space.jpeg");
+            InputStream inputStream = this.getClass().getResourceAsStream("image/space.jpeg");
             image = ImageIO.read(inputStream);
 
         } catch (IOException e) {
@@ -32,7 +30,7 @@ public class BlockBreakingEnd extends JPanel implements KeyListener {
 
 
         try {
-            InputStream url = this.getClass().getResourceAsStream("../audio/ballDead.wav");
+            InputStream url = this.getClass().getResourceAsStream("audio/ballDead.wav");
             AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(url);
             clip = AudioSystem.getClip();
 

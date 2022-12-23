@@ -11,7 +11,6 @@ import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 
 public class BlockBreakingFront extends JPanel implements KeyListener, Runnable {
 
@@ -20,7 +19,7 @@ public class BlockBreakingFront extends JPanel implements KeyListener, Runnable 
 
     public BlockBreakingFront() {
         try {
-            InputStream url = this.getClass().getResourceAsStream("../image/space.jpeg");
+            InputStream url = this.getClass().getResourceAsStream("image/space.jpeg");
             image = ImageIO.read(url);
 
         } catch (IOException e) {
@@ -28,7 +27,7 @@ public class BlockBreakingFront extends JPanel implements KeyListener, Runnable 
         }
 
         try {
-            InputStream url = this.getClass().getResourceAsStream("../audio/frontBGM.wav");
+            InputStream url = this.getClass().getResourceAsStream("audio/frontBGM.wav");
             AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(url);
             clip = AudioSystem.getClip();
 
