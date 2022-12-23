@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="blockBreaking:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/blockBreaking_jar</output-path>
+    <root id="archive" name="blockBreaking.jar">
+      <element id="module-output" name="blockBreaking" />
+    </root>
+  </artifact>
+</component>

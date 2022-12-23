@@ -7,9 +7,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.LinkedList;
 
@@ -29,13 +29,15 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
     private float ballRadius;
     private Clip clip;
     public static int score = 0;
-    private File f1, f2;
+    private InputStream f1, f2;
 
     public BlockBreakingMain(int stage) {
         setBackground(black);
 
-        f1 = new File("audio/ballCollision.wav");
-        f2 = new File("audio/stickCollision.wav");
+        /*f1 = new File("audio/ballCollision.wav");
+        f2 = new File("audio/stickCollision.wav");*/
+        f1 = this.getClass().getResourceAsStream("../audio/ballCollision.wav");
+        f2 = this.getClass().getResourceAsStream("../audio/stickCollision.wav");
 
         objects = new LinkedList<>();
         end = false;
@@ -60,14 +62,14 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
         t.start();
     }
 
-    private void ballCollisionSound(File f1) {
+    private void ballCollisionSound(InputStream f1) {
         soundControl(f1);
     }
-    private void stickCollisionSound(File f2) {
+    private void stickCollisionSound(InputStream f2) {
         soundControl(f2);
     }
 
-    private void soundControl(File f) {
+    private void soundControl(InputStream f) {
         try {
             AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(f);
 

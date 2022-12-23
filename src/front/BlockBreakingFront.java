@@ -9,9 +9,9 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 
 public class BlockBreakingFront extends JPanel implements KeyListener, Runnable {
 
@@ -20,15 +20,16 @@ public class BlockBreakingFront extends JPanel implements KeyListener, Runnable 
 
     public BlockBreakingFront() {
         try {
-            image = ImageIO.read(new FileInputStream("image/space.jpeg"));
+            InputStream url = this.getClass().getResourceAsStream("../image/space.jpeg");
+            image = ImageIO.read(url);
 
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        File file = new File("audio/frontBGM.wav");
         try {
-            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(file);
+            InputStream url = this.getClass().getResourceAsStream("../audio/frontBGM.wav");
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(url);
             clip = AudioSystem.getClip();
 
             clip.open(audioInputStream);
