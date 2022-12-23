@@ -2,19 +2,23 @@ package end;
 
 import front.BlockBreakFrontView;
 import front.CustomLabel;
+import main.BlockBreakingMain;
 
 import javax.imageio.ImageIO;
+import javax.sound.sampled.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
 public class BlockBreakingEnd extends JPanel implements KeyListener {
 
     private BufferedImage image;
+    private Clip clip;
 
     public BlockBreakingEnd() {
         try {
@@ -24,8 +28,22 @@ public class BlockBreakingEnd extends JPanel implements KeyListener {
             e.printStackTrace();
         }
 
+        File file = new File("audio/ballDead.wav");
+        try {
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(file);
+            clip = AudioSystem.getClip();
+
+            clip.open(audioInputStream);
+            clip.start();
+
+        } catch (UnsupportedAudioFileException | IOException e) {
+            e.printStackTrace();
+        } catch (LineUnavailableException e) {
+            throw new RuntimeException(e);
+        }
+
         JLabel label = new CustomLabel("The End", Color.RED, Font.BOLD, 80);
-        JLabel score = new CustomLabel("Score : " + "80", Color.WHITE, Font.BOLD, 80);
+        JLabel score = new CustomLabel("Score : " + BlockBreakingMain.score, Color.WHITE, Font.BOLD, 80);
 
         setLayout(new GridLayout(2, 1));
 

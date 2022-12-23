@@ -1,17 +1,19 @@
 package main;
 
 import end.BlockBreakEndView;
-import game.StageStep;
 
+import javax.sound.sampled.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.ListIterator;
 
-import static game.StageStep.*;
+import static game.StageStep.THREE;
 import static java.awt.Color.*;
 
 public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
@@ -25,10 +27,15 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
     private int stage;
     private boolean nextStage;
     private float ballRadius;
-    private static int score = 0;
+    private Clip clip;
+    public static int score = 0;
+    private File f1, f2;
 
     public BlockBreakingMain(int stage) {
         setBackground(black);
+
+        f1 = new File("audio/ballCollision.wav");
+        f2 = new File("audio/stickCollision.wav");
 
         objects = new LinkedList<>();
         end = false;
@@ -53,10 +60,34 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
         t.start();
     }
 
+    private void ballCollisionSound(File f1) {
+        soundControl(f1);
+    }
+    private void stickCollisionSound(File f2) {
+        soundControl(f2);
+    }
+
+    private void soundControl(File f) {
+        try {
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(f);
+
+            clip = AudioSystem.getClip();
+
+            clip.open(audioInputStream);
+            clip.start();
+
+        } catch (IOException | UnsupportedAudioFileException e) {
+            e.printStackTrace();
+        } catch (LineUnavailableException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
+        // 라켓 그리기
         stick.draw(g);
 
         // 블록 채우기
@@ -75,6 +106,11 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
         repaint();
     }
 
+    /**
+     * 블록 랜덤으로 노란색 채우기 -> 충돌하면 공의 개수가 증가한다.
+     * @param g
+     * @param o
+     */
     private void blockBreakAllow(Graphics g, GameObject o) {
         if (((Block) o).isColorCheck()) {
             o.color = YELLOW;
@@ -115,11 +151,18 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
         objects.addAll(Arrays.asList(blocks));
     }
 
+    /**
+     * 다음 스테이지로 넘어간다.
+     * @param stage
+     */
     public void nextStage(int stage) {
         new BlockBreakMainView(stage);
         nextStage = false;
     }
 
+    /**
+     * 게임 종료
+     */
     public void end() {
         new BlockBreakEndView();
         end = false;
@@ -165,31 +208,20 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
                 for (int j = 0; j < objects.size(); j++) {
                     if (!(objects.get(j) instanceof Block block)) continue;
 
-                    if (ball.isCollide(block)) {
-                        if (!block.isBlockBreakCheck()) {
-                            objects.remove(block);
-                            BlockBreakingMain.score += 100;
-                            if(block.isColorCheck()) {
-                                objects.add(new Ball(new Point((int)( block.getP().x + block.getWidth()),
-                                        block.getP().y), WHITE, ballRadius));
-                            }
-                        }
-                        ball.collision(block);
-                    }
+                    blockCollisionControl(ball, block);
                 }
-                if (ball.isCollide(stick))
-                    ball.collision(stick);
+                stickCollisionControl(ball);
 
-                if (ball.ballRemove(this)) {
-                    objects.remove(ball);
-                }
+                outOfBall(ball);
             }
 
+            // 다음 스테이지로 넘어갈 조건
             if(!nextStageCheck()) {
                 nextStage = true;
                 break;
             }
 
+            // 게임 종료 조건
             if (!endCheck(stage)) {
                 end = true;
                 break;
@@ -197,14 +229,52 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
             repaint();
         }
 
+        // 다음 스테이지
         if(nextStage) {
             nextStage(stage + 1);
         }
 
+        // 게임 종료
         if(end) {
             end();
         }
+
         repaint();
+    }
+
+    private void outOfBall(Ball ball) {
+        if (ball.ballRemove(this)) {
+            objects.remove(ball);
+        }
+    }
+
+    private void stickCollisionControl(Ball ball) {
+        if (ball.isCollide(stick)) {
+            stickCollisionSound(f2);
+            ball.collision(stick);
+        }
+    }
+
+    private void blockCollisionControl(Ball ball, Block block) {
+        if (ball.isCollide(block)) {
+            ballCollisionSound(f1);
+            if (!block.isBlockBreakCheck()) {
+                objects.remove(block);
+
+                // 공이 블록과 충돌하면 100점 UP
+                BlockBreakingMain.score += 100;
+
+                collisionBallInc(block);
+            }
+            ball.collision(block);
+        }
+    }
+
+    private void collisionBallInc(Block block) {
+        if(block.isColorCheck()) {
+            objects.add(new Ball(new Point((int)( block.getP().x + block.getWidth()),
+                    block.getP().y), WHITE, ballRadius));
+        }
     }
 
     private boolean nextStageCheck() {
