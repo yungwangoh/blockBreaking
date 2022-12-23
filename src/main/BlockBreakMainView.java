@@ -1,11 +1,7 @@
 package main;
 
-import end.BlockBreakEndView;
-
 import javax.swing.*;
 import java.awt.*;
-
-import static game.StageStep.*;
 
 public class BlockBreakMainView extends JFrame {
 

@@ -171,20 +171,28 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
     @Override
     public void keyPressed(KeyEvent e) {
         if(e.getKeyCode() == KeyEvent.VK_LEFT) {
-            stick.p.x -= 50;
-            stick.p.y = 700;
-            stick.setP(stick.getP());
-
-            if(stick.p.x < 0) stick.p.x = 0;
+            keyLeftMove();
 
         } else if(e.getKeyCode() == KeyEvent.VK_RIGHT) {
-            stick.p.x += 50;
-            stick.p.y = 700;
-            stick.setP(stick.getP());
-
-            if(stick.p.x + stickWidth > 800) stick.p.x = 800 - stickWidth;
+            keyRightMove();
         }
         repaint();
+    }
+
+    private void keyRightMove() {
+        stick.p.x += 50;
+        stick.p.y = 700;
+        stick.setP(stick.getP());
+
+        if(stick.p.x + stickWidth > 800) stick.p.x = 800 - stickWidth;
+    }
+
+    private void keyLeftMove() {
+        stick.p.x -= 50;
+        stick.p.y = 700;
+        stick.setP(stick.getP());
+
+        if(stick.p.x < 0) stick.p.x = 0;
     }
 
     @Override
@@ -272,8 +280,8 @@ public class BlockBreakingMain extends JPanel implements KeyListener, Runnable {
 
     private void collisionBallInc(Block block) {
         if(block.isColorCheck()) {
-            objects.add(new Ball(new Point((int)( block.getP().x + block.getWidth()),
-                    block.getP().y), WHITE, ballRadius));
+            objects.add(new Ball(new Point((int)( block.getP().x + block.getWidth()) / 2,
+                    (int) (block.getP().y + block.getHeight())), WHITE, ballRadius));
         }
     }
 
